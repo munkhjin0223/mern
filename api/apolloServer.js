@@ -1,13 +1,5 @@
-const { ApolloServer, gql } = require("apollo-server-express");
-const mongoose = require("mongoose");
-const { Schema } = require("mongoose");
-
-const bookSchema = new Schema({
-  title: String, // String is shorthand for {type: String}
-  author: String,
-});
-
-const Books = mongoose.model("books", bookSchema);
+import { ApolloServer, gql } from "apollo-server-express";
+import { Books } from "./models.js";
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
@@ -31,23 +23,8 @@ const typeDefs = gql`
 // schema. This resolver retrieves books from the "books" array above.
 const resolvers = {
   Query: {
-    books: async () => {
-      try {
-        const books = [
-          {
-            author: "Rhiannon Frater",
-            title: "The First Days",
-          },
-          {
-            author: "J.L. Bourne",
-            title: "Day by Day Armageddon",
-          },
-        ];
-
-        return books;
-      } catch (e) {
-        console.log("e: ", e.message);
-      }
+    books: () => {
+      return Books.find();
     },
   },
 
@@ -58,7 +35,7 @@ const resolvers = {
   },
 };
 
-exports.apolloServer = new ApolloServer({
+export const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
 });
